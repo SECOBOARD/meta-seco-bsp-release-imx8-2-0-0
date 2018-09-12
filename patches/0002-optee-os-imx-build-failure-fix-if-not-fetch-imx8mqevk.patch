@@ -1,0 +1,30 @@
+From: Mathanraj  Murugan <mathan.raj@seco.com>
+Subject: [PATCH] optee-os-imx: fix build failure when machine isn't imx8mqevk
+
+Modify the condition to check SOC type instead of board type.
+If the SOC is i.mx8m, then apply 'mx8mqevk' as PLATFORM_FLAVOR to build optee-os.
+---
+ imx/meta-bsp/recipes-security/optee-imx/optee-os-imx_git.bb | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+--- imx-yocto-4-9-88/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-security/optee-imx/optee-os-imx_git.bb	2018-07-21 14:08:38.236928648 +0530
++++ Desktop/imx-yocto-4-9-88/sources/meta-fsl-bsp-release/imx/meta-bsp/recipes-security/optee-imx/optee-os-imx_git.bb	2018-07-21 14:59:50.087475765 +0530
+@@ -19,6 +19,7 @@
+ 
+ python () {
+ 	machine = d.getVar("MACHINE", True)
++	machineoverrides=(d.getVar('MACHINEOVERRIDES', True) or '').split(':')
+ 
+ 	import re
+ 	if re.match('imx6qpdlsolox',machine):
+@@ -27,8 +28,8 @@
+ 		subplatform = 'mx6ulevk'
+ 	elif re.match('imx6ull',machine):
+ 		subplatform = 'mx6ullevk'
+-	elif re.match('imx',machine):
+-		subplatform = machine[1:]
++	elif 'mx8mq' in machineoverrides:
++		subplatform = 'mx8mqevk'
+ 	else:
+         	bb.fatal("optee-os-imx doesn't recognize this MACHINE")
+ 	d.setVar("OPTEE_PLATFORM", subplatform)
